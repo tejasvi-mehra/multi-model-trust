@@ -295,4 +295,6 @@ flowchart TD
 
 ## AI-use disclosure
 
-Claude (via Cursor) assisted with the initial scaffold, service modules, tests, Docker/Makefile artifacts, samples, and documentation. The repository author reviewed consensus behavior (citation filtering, similarity thresholds, borderline judge gating, valid-source prioritization), refreshed prefetched test fixtures, and verified the test suite and sample payloads.
+The repository author devised the initial framework layout, file structure, and separation of framework utilities from service logic; defined the overall system design and information flow from request routing through citation validation, consensus grouping, and response metrics; and set the conventions for configuration, samples, and tests.
+
+Claude (via Cursor) assisted with implementing and refining the scaffold, service modules, tests, Docker/Makefile artifacts, samples, and documentation. The author reviewed consensus behavior (citation filtering, similarity thresholds, borderline judge gating, valid-source prioritization), refreshed prefetched test fixtures, and verified the test suite and sample payloads.
