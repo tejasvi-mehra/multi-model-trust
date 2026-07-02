@@ -1,0 +1,6 @@
+{
+  "https://fastapi.tiangolo.com/": "fastapi_home.html",
+  "https://fastapi.tiangolo.com/features/": "fastapi_features.html",
+  "https://www.python.org/doc/essays/blurb/": "python_blurb.html",
+  "https://docs.python.org/3/library/asyncio.html": "asyncio.html"
+}
