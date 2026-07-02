@@ -2,7 +2,7 @@
 
 Multi-Model Trust compares answers from two or more models on the same prompt. It validates citations, groups related claims, labels agreement or disagreement, and returns a structured trust report with metrics.
 
-For a guided tour, see `WALKTHROUGH.md`.
+Repository: https://github.com/tejasvi-mehra/multi-model-trust
 
 ## What The Service Does
 
@@ -13,94 +13,156 @@ Given several model responses to the same prompt, where do they agree,
 where do they disagree, and are their citations valid?
 ```
 
-The caller sends:
+The caller sends one prompt, two or more model responses, and for each claim optional citations (`url` + exact `quote`).
 
-- one prompt
-- two or more model response objects
-- each model response contains claims
-- each claim can include citations with a URL and exact quote
+The service returns citation validation results, consensus groups, labels (`AGREE`, `DISAGREE`, `PARTIAL`, `INVALID`), and metrics including citation precision, support scores, and group counts.
 
-The service returns:
+### Label meanings
 
-- citation validation results for every claim
-- consensus groups across model claims
-- labels of `AGREE`, `DISAGREE`, `PARTIAL`, or `INVALID`
-- citation precision, support scores, and group counts
+| Label | Meaning |
+| --- | --- |
+| `AGREE` | Multiple models made materially similar claims without detected contradiction |
+| `DISAGREE` | Similar claims contain opposition signals (e.g. suitable vs not suitable) |
+| `PARTIAL` | Only one validly cited model made the claim, or overlap among valid claims was too weak |
+| `INVALID` | All related claims have missing, incorrect, or unreachable citations |
 
-## Core Logic
+When at least one model has valid citations, invalid or unreachable claims are excluded from similarity checks and listed under `invalidated_members`.
+
+### Citation validation
+
+| Status | Meaning |
+| --- | --- |
+| `VALID` | All citations fetched and every quote found in source text |
+| `INVALID` | Source fetched but one or more quotes not found |
+| `UNREACHABLE` | Source URL could not be fetched (`reason`: `source not reachable`) |
+| `MISSING` | No citation attached to the claim |
+
+Each citation includes a `support_score` (0–1): token overlap between the claim statement and the quoted text.
+
+## End-to-end flow
 
 ```text
-request
-  -> route caller-supplied model responses
-  -> fetch citation URLs
-  -> check whether each quote appears in fetched source text
-  -> score claim-to-quote support
-  -> group similar claims by token overlap
-  -> label grouped claims as AGREE, DISAGREE, PARTIAL, or INVALID
-  -> return structured trust report
+POST /v1/trust-orchestrate
+  -> validate request (2+ distinct models)
+  -> route caller-supplied responses
+  -> fetch citation URLs concurrently
+  -> verify quotes + compute support scores
+  -> group claims by similarity and opposition
+  -> optionally attach borderline cross-LLM judge prompt
+  -> return TrustResponse + metrics + JSON logs
 ```
 
-`AGREE` means multiple models made materially similar claims without detected contradiction.
+## Consensus logic
 
-`DISAGREE` means similar claims contain opposition signals, such as one claim saying something is suitable and another saying it is not suitable.
+Consensus runs after citation validation and only compares claims with `VALID` citations.
 
-`PARTIAL` means only one validly cited model made the claim, or validly cited claims overlap too weakly to be treated as shared.
+**1. Build members.** Each model claim becomes a `ConsensusMember` with citation status and any citation errors.
 
-`INVALID` means all related model claims have missing, incorrect, or unreachable citations. When at least one model has a valid citation, invalid model claims are excluded from similarity checks and listed under `invalidated_members`.
+**2. Group valid claims.** For each valid claim, compare its statement to existing group members using Jaccard token overlap (stopwords removed). Two claims join the same group when:
 
-Citation validation reports:
+- token similarity ≥ `CONSENSUS_SIMILARITY_THRESHOLD`, or
+- opposition is detected (negation mismatch on similar claims, or configured opposing term pairs such as `suitable|not suitable`), or
+- cross-LLM judge is enabled, similarity is in the borderline band, threshold/opposition did not already decide, and the simulated judge returns `AGREE` or `DISAGREE`
 
-- `UNREACHABLE` when the source URL could not be fetched
-- `INVALID` when the source was fetched but the quote was not found
-- `MISSING` when no citation was provided
+**3. Attach invalidated claims.** Claims with bad or unreachable citations are linked to a valid group when they are loosely related (using `CONSENSUS_OPPOSITION_SIMILARITY_THRESHOLD`). They are stored in `invalidated_members` and excluded from the similarity comparison that drives the label.
 
-Each citation includes a `support_score` (0–1) measuring token overlap between the claim statement and the quoted text.
+**4. Label each group.**
 
-When `CROSS_LLM_JUDGE=true`, borderline comparisons run only when consensus was not already reached by similarity threshold or opposition detection, and only among claims with `VALID` citations. Set `CONSENSUS_SIMILARITY_THRESHOLD=0.9` for `samples/llm_judge_request.json`.
+- `DISAGREE` if any pair in the group has opposition, or the borderline judge decision is `DISAGREE`
+- `AGREE` if multiple distinct models are in the group and there is no disagreement
+- `PARTIAL` if only one model remains in the group after citation filtering, or one valid model was prioritized over invalidated members
+- `INVALID` if no valid members remain (only invalidated claims)
 
-## Project Structure
+**5. Cross-LLM judge.** When `CROSS_LLM_JUDGE=true`, a sample judge prompt is attached only for borderline valid-citation pairs where normal threshold and opposition checks did not already resolve grouping. Invalid-only groups never receive a judge prompt.
+
+For `samples/llm_judge_request.json`, also set `CONSENSUS_SIMILARITY_THRESHOLD=0.9` so similarity falls in the borderline band below the normal grouping threshold.
+
+## Project structure
 
 ```text
 .
-├── config.py
-├── main.py
+├── config.py                          settings + consensus engine factory
+├── main.py                            FastAPI app and orchestration endpoint
 ├── internal/
 │   ├── framework/
-│   │   ├── logger.py
-│   │   └── runner.py
+│   │   ├── logger.py                  structured logging helpers
+│   │   └── runner.py                  bounded async concurrency
 │   └── service/
-│       ├── schemas.py
-│       ├── router.py
-│       ├── validator.py
-│       └── consensus.py
+│       ├── schemas.py                 Pydantic request/response models
+│       ├── router.py                  response routing interface
+│       ├── validator.py               citation fetch + validation
+│       └── consensus.py               claim grouping and labeling
+├── samples/                           request payloads + expected summaries
 ├── tests/
-│   ├── fixtures/pages/          prefetched HTML for offline tests
-│   ├── evaluation/
-│   └── unit/
-├── samples/
-└── openapi.yaml
+│   ├── fixtures/pages/                prefetched HTML for offline tests
+│   ├── unit/
+│   └── evaluation/
+├── scripts/refresh_prefetched_pages.py
+├── openapi.yaml                       full API specification
+├── .env.example                       configuration template
+├── .github/workflows/pr-tests.yml   CI pipeline
+├── Dockerfile
+├── docker-compose.yml
+├── Makefile
+└── requirements.txt
 ```
 
-Framework utilities live outside business logic. `main.py` wires framework helpers into the service layer and reloads consensus settings from the environment on each request.
+The application intentionally contains **eight Python source files** under `config.py`, `main.py`, and `internal/`. Tests, samples, and tooling are separate.
 
-## API
+## Eight Python files — logic breakdown
 
-```http
-POST /v1/trust-orchestrate
-GET /healthz
-```
+### `config.py`
+
+Loads runtime settings from environment variables (and `.env` when present). Parses consensus stopwords, opposing term pairs, citation limits, and cross-LLM judge options. Exposes `load_settings()` and `build_consensus_engine()` so the API can rebuild the consensus engine on every request without restarting the process.
+
+### `main.py`
+
+FastAPI entrypoint. Wires the logger, mock response router, HTTP citation validator, and per-request consensus engine. Implements `GET /healthz` and `POST /v1/trust-orchestrate`: validates model count, routes responses, validates citations, builds consensus, aggregates metrics, emits JSON trace logs, and returns `TrustResponse`.
+
+### `internal/framework/logger.py`
+
+Generic logging utilities. `build_logger()` creates a reusable stream logger; `log_json()` writes one structured JSON line per pipeline event (orchestration start/complete, consensus comparisons, group decisions).
+
+### `internal/framework/runner.py`
+
+Generic async helper. `map_bounded()` runs an async worker over a list with a concurrency limit while preserving result order. Used by the citation validator to fetch many URLs in parallel without unbounded fan-out.
+
+### `internal/service/schemas.py`
+
+Pydantic models for the API boundary: `TrustRequest`, `TrustResponse`, claims, citations, validation results, consensus groups, cross-LLM judge payload, and metrics. Enforces distinct model names and field constraints at parse time.
+
+### `internal/service/router.py`
+
+Defines the `ResponseRouter` protocol and `MockResponseRouter`, which passes through caller-supplied responses. Includes a commented example sketch for a future provider-backed router.
+
+### `internal/service/validator.py`
+
+Citation pipeline. Defines the `UrlFetcher` protocol and `HttpxUrlFetcher` (with configurable `User-Agent`). Fetches each citation URL, normalizes page text, checks quote presence, assigns `support_score`, and rolls up claim-level status (`VALID`, `INVALID`, `UNREACHABLE`, `MISSING`). Exports metric helpers: `citation_precision`, `average_citation_support_score`, `unreachable_citation_count`.
+
+### `internal/service/consensus.py`
+
+Trust comparison engine. Tokenizes claims, computes Jaccard similarity, detects negation and configured opposition pairs, groups valid claims, links invalidated members, optionally attaches a borderline cross-LLM judge prompt, and assigns final group labels with structured logging at each comparison step.
+
+## API specification
+
+| Resource | Location |
+| --- | --- |
+| OpenAPI YAML (full contract) | [`openapi.yaml`](openapi.yaml) · [view on GitHub](https://github.com/tejasvi-mehra/multi-model-trust/blob/main/openapi.yaml) |
+| Interactive docs (server running) | `http://localhost:8000/docs` |
+| Health check | `GET /healthz` |
+| Orchestration | `POST /v1/trust-orchestrate` |
 
 Example request:
 
 ```json
 {
-  "prompt": "Should a small backend team use Python and FastAPI for an MVP API?",
+  "prompt": "Should a small backend team use Python and FastAPI for an API?",
   "responses": [
     {
       "model": "mock-alpha",
       "claims": [
         {
-          "statement": "Python is suitable for MVP backend APIs because it is high-level.",
+          "statement": "Python is suitable for backend APIs because it is high-level.",
           "citations": [
             {
               "url": "https://www.python.org/doc/essays/blurb/",
@@ -114,7 +176,7 @@ Example request:
       "model": "mock-beta",
       "claims": [
         {
-          "statement": "Python is not suitable for high-throughput backend APIs when raw runtime speed is the top priority.",
+          "statement": "Python is not suitable for backend APIs when raw runtime speed is the top priority.",
           "citations": [
             {
               "url": "https://www.python.org/doc/essays/blurb/",
@@ -128,9 +190,28 @@ Example request:
 }
 ```
 
-The maintained OpenAPI contract is in `openapi.yaml`. Interactive docs are at `/docs` when the service is running.
+## Configuration
 
-## Local Build And Run
+Copy `.env.example` to `.env`. `make run` loads it via `python-dotenv`. Quote values that contain spaces or pipes.
+
+| Variable | Purpose |
+| --- | --- |
+| `SERVICE_NAME`, `LOG_LEVEL` | Logger identity and verbosity |
+| `CITATION_TIMEOUT_SECONDS` | HTTP timeout for citation fetches |
+| `MAX_CITATION_CONCURRENCY` | Parallel citation fetch limit |
+| `MIN_MODEL_RESPONSES` | Minimum models required per request |
+| `CITATION_USER_AGENT` | User-Agent header sent when fetching citations |
+| `CONSENSUS_SIMILARITY_THRESHOLD` | Token overlap needed to group agreeing claims |
+| `CONSENSUS_OPPOSITION_SIMILARITY_THRESHOLD` | Overlap needed before negation counts as opposition |
+| `CONSENSUS_STOPWORDS` | Comma-separated words ignored during similarity |
+| `CONSENSUS_OPPOSING_TERMS` | Comma-separated `positive\|negative` pairs for contradiction checks |
+| `CROSS_LLM_JUDGE` | Enable borderline judge prompt emission |
+| `CROSS_LLM_JUDGE_MODEL_NAME` | Label shown on the judge prompt object |
+| `CROSS_LLM_JUDGE_BORDERLINE_LOW` / `HIGH` | Similarity band that triggers the judge |
+
+The consensus engine is rebuilt from env on every request through `config.build_consensus_engine()`.
+
+## Local build and run
 
 ```bash
 python -m venv .venv
@@ -140,7 +221,7 @@ cp .env.example .env
 make run
 ```
 
-Try the sample scenarios:
+Try sample payloads:
 
 ```bash
 curl -X POST http://localhost:8000/v1/trust-orchestrate \
@@ -148,9 +229,9 @@ curl -X POST http://localhost:8000/v1/trust-orchestrate \
   --data @samples/agreement_request.json
 ```
 
-Additional samples cover agreement, disagreement, mixed opinion, partial invalid citations, all-invalid citations, a large mixed payload, and a borderline judge case. See `samples/sources.md` for citation URLs and verified quotes.
+Samples under `samples/` cover agreement, disagreement, mixed opinion, partial invalid citations, all-invalid citations, a large mixed payload, and a borderline judge case. Citation URLs and quotes are documented in `samples/sources.md`.
 
-For the judge sample, set in `.env`:
+Judge sample — set in `.env`:
 
 ```text
 CROSS_LLM_JUDGE=true
@@ -159,31 +240,32 @@ CONSENSUS_SIMILARITY_THRESHOLD=0.9
 
 Then POST `samples/llm_judge_request.json`.
 
-## Configuration
-
-Copy `.env.example` to `.env`. Important variables:
-
-```text
-CONSENSUS_SIMILARITY_THRESHOLD=0.35
-CONSENSUS_OPPOSITION_SIMILARITY_THRESHOLD=0.35
-CONSENSUS_OPPOSING_TERMS=suitable|not suitable,recommended|not recommended,...
-CROSS_LLM_JUDGE=false
-CROSS_LLM_JUDGE_BORDERLINE_LOW=0.75
-CROSS_LLM_JUDGE_BORDERLINE_HIGH=0.85
-CITATION_USER_AGENT=multi-model-trust/0.1.0 (+https://github.com/tejasvi-mehra/multi-model-trust)
-```
-
 ## Tests
 
 ```bash
-make test
-make test-unit
-make test-eval
+make test          # all tests
+make test-unit     # tests/unit
+make test-eval     # tests/evaluation
 ```
 
 Unit tests cover API behavior, schemas, routing, validation, consensus, config, logging, and async helpers.
 
-Evaluation tests load the sample JSON files and assert expected labels, citation metrics, and judge visibility. Citation pages are read from `tests/fixtures/pages` through `PrefetchedPageFetcher`, so tests run offline while still using the same URLs as the samples.
+Evaluation tests load sample JSON and assert expected labels and metrics. Citation pages are read from `tests/fixtures/pages` via `PrefetchedPageFetcher`, so tests stay offline while using the same URLs as the samples. Refresh snapshots with:
+
+```bash
+python scripts/refresh_prefetched_pages.py
+```
+
+## CI workflow
+
+GitHub Actions workflow: [`.github/workflows/pr-tests.yml`](.github/workflows/pr-tests.yml)
+
+| Trigger | `pull_request`, push to `main` |
+| Runner | `ubuntu-latest` |
+| Python | 3.12 |
+| Steps | checkout → install `requirements.txt` → `pytest -q` |
+
+The pipeline runs the full unit and evaluation test suite on every PR and main-branch push.
 
 ## Docker
 
@@ -194,7 +276,7 @@ make docker-run
 docker compose up --build
 ```
 
-## System Design
+## System diagram
 
 ```mermaid
 flowchart TD
@@ -210,3 +292,7 @@ flowchart TD
     JudgePrompt --> Labels
     Labels --> Response["TrustResponse + Metrics"]
 ```
+
+## AI-use disclosure
+
+Claude (via Cursor) assisted with the initial scaffold, service modules, tests, Docker/Makefile artifacts, samples, and documentation. The repository author reviewed consensus behavior (citation filtering, similarity thresholds, borderline judge gating, valid-source prioritization), refreshed prefetched test fixtures, and verified the test suite and sample payloads.
