@@ -1,0 +1,18 @@
+services:
+  api:
+    build: .
+    environment:
+      SERVICE_NAME: multi-model-trust
+      LOG_LEVEL: INFO
+      CITATION_TIMEOUT_SECONDS: "5"
+      MAX_CITATION_CONCURRENCY: "8"
+      CONSENSUS_SIMILARITY_THRESHOLD: "0.35"
+      CONSENSUS_OPPOSITION_SIMILARITY_THRESHOLD: "0.35"
+      CONSENSUS_STOPWORDS: "a,an,and,are,for,in,is,of,or,the,to,with"
+      CONSENSUS_OPPOSING_TERMS: "suitable|not suitable,recommended|not recommended,supported|unsupported,safe|unsafe,correct|incorrect,increase|decrease,higher|lower"
+      CROSS_LLM_JUDGE: "false"
+      CROSS_LLM_JUDGE_MODEL_NAME: "LLM judge model"
+      CROSS_LLM_JUDGE_BORDERLINE_LOW: "0.75"
+      CROSS_LLM_JUDGE_BORDERLINE_HIGH: "0.85"
+    ports:
+      - "8000:8000"
