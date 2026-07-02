@@ -1,0 +1,77 @@
+{
+  "prompt": "Can citation validation prioritize valid sources and drop invalid model evidence?",
+  "responses": [
+    {
+      "model": "mock-alpha",
+      "claims": [
+        {
+          "statement": "FastAPI documentation includes automatic API docs.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/features/",
+              "quote": "This exact fake phrase should not appear on the FastAPI docs page."
+            },
+            {
+              "url": "https://www.python.org/doc/essays/blurb/",
+              "quote": "This fake python quote should not appear on the page."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "model": "mock-beta",
+      "claims": [
+        {
+          "statement": "FastAPI documentation includes generated API docs.",
+          "citations": [
+            {
+              "url": "https://www.python.org/doc/essays/trust-mvp-unreachable-page/",
+              "quote": "Automatic docs"
+            },
+            {
+              "url": "https://fastapi.tiangolo.com/features/",
+              "quote": "This beta fake quote should not appear on the page."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "model": "mock-gamma",
+      "claims": [
+        {
+          "statement": "FastAPI documentation includes automatic API documentation.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/features/",
+              "quote": "Automatic docs"
+            },
+            {
+              "url": "https://fastapi.tiangolo.com/",
+              "quote": "Interactive API docs"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "model": "mock-delta",
+      "claims": [
+        {
+          "statement": "FastAPI documentation includes interactive API documentation.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/",
+              "quote": "Interactive API docs"
+            },
+            {
+              "url": "https://fastapi.tiangolo.com/features/",
+              "quote": "based on open standards"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "prompt": "Should a small backend team use Python and FastAPI for an MVP API that needs clear validation and fast iteration?",
+  "responses": [
+    {
+      "model": "mock-alpha",
+      "claims": [
+        {
+          "statement": "Python is suitable for MVP backend APIs because it is high-level and supports fast iteration.",
+          "citations": [
+            {
+              "url": "https://www.python.org/doc/essays/blurb/",
+              "quote": "Python is an interpreted, object-oriented, high-level programming language with dynamic semantics."
+            }
+          ]
+        },
+        {
+          "statement": "FastAPI is suitable for API work because it provides automatic interactive documentation.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/",
+              "quote": "Interactive API docs"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "model": "mock-beta",
+      "claims": [
+        {
+          "statement": "Python is not suitable for high-throughput backend APIs when raw runtime speed is the top priority.",
+          "citations": [
+            {
+              "url": "https://www.python.org/doc/essays/blurb/",
+              "quote": "Python is an interpreted, object-oriented, high-level programming language with dynamic semantics."
+            }
+          ]
+        },
+        {
+          "statement": "FastAPI is suitable for API teams that want generated documentation from the API contract.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/features/",
+              "quote": "Automatic docs"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

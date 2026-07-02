@@ -1,0 +1,181 @@
+{
+  "prompt": "Evaluate FastAPI documentation, Python suitability, and async backend patterns for an MVP delivery plan.",
+  "responses": [
+    {
+      "model": "mock-alpha",
+      "claims": [
+        {
+          "statement": "FastAPI supports interactive API documentation for backend HTTP services.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/",
+              "quote": "Interactive API docs"
+            },
+            {
+              "url": "https://fastapi.tiangolo.com/",
+              "quote": "automatic interactive documentation"
+            }
+          ]
+        },
+        {
+          "statement": "Python is suitable for backend MVP APIs when developer speed is important.",
+          "citations": [
+            {
+              "url": "https://www.python.org/doc/essays/blurb/",
+              "quote": "Python is an interpreted, object-oriented, high-level programming language with dynamic semantics."
+            },
+            {
+              "url": "https://www.python.org/doc/essays/blurb/",
+              "quote": "increased productivity it provides"
+            }
+          ]
+        },
+        {
+          "statement": "Async workloads can improve throughput for IO-bound backend services.",
+          "citations": [
+            {
+              "url": "https://docs.python.org/3/library/asyncio.html",
+              "quote": "asyncio is a library to write concurrent code using the async/await syntax."
+            },
+            {
+              "url": "https://docs.python.org/3/library/asyncio.html",
+              "quote": "asyncio is used as a foundation for multiple Python asynchronous frameworks"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "model": "mock-beta",
+      "claims": [
+        {
+          "statement": "FastAPI supports automatic API documentation for backend REST services.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/features/",
+              "quote": "Automatic docs"
+            },
+            {
+              "url": "https://fastapi.tiangolo.com/features/",
+              "quote": "based on open standards"
+            }
+          ]
+        },
+        {
+          "statement": "Python is suitable for backend MVP APIs when developer speed is prioritized.",
+          "citations": [
+            {
+              "url": "https://www.python.org/doc/essays/blurb/",
+              "quote": "Python's simple, easy to learn syntax emphasizes readability"
+            },
+            {
+              "url": "https://www.python.org/doc/essays/blurb/",
+              "quote": "increased productivity it provides"
+            }
+          ]
+        },
+        {
+          "statement": "Async event loops can improve throughput for IO-bound backend services.",
+          "citations": [
+            {
+              "url": "https://docs.python.org/3/library/asyncio.html",
+              "quote": "asyncio is used as a foundation for multiple Python asynchronous frameworks"
+            },
+            {
+              "url": "https://docs.python.org/3/library/asyncio.html",
+              "quote": "asyncio is a library to write concurrent code using the async/await syntax."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "model": "mock-gamma",
+      "claims": [
+        {
+          "statement": "FastAPI supports API documentation for backend JSON services.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/features/",
+              "quote": "Automatic docs"
+            },
+            {
+              "url": "https://fastapi.tiangolo.com/",
+              "quote": "Interactive API docs"
+            }
+          ]
+        },
+        {
+          "statement": "Python is not suitable for backend MVP APIs when raw runtime speed is the top priority.",
+          "citations": [
+            {
+              "url": "https://www.python.org/doc/essays/blurb/",
+              "quote": "Python is an interpreted, object-oriented, high-level programming language with dynamic semantics."
+            },
+            {
+              "url": "https://docs.python.org/3/library/asyncio.html",
+              "quote": "asyncio is a library to write concurrent code using the async/await syntax."
+            }
+          ]
+        },
+        {
+          "statement": "Blocking-only runtimes are not recommended for IO-bound backend throughput goals.",
+          "citations": [
+            {
+              "url": "https://docs.python.org/3/library/asyncio.html",
+              "quote": "asyncio is used as a foundation for multiple Python asynchronous frameworks"
+            },
+            {
+              "url": "https://fastapi.tiangolo.com/",
+              "quote": "This invalid gamma blocking quote is not on the page."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "model": "mock-delta",
+      "claims": [
+        {
+          "statement": "FastAPI provides automatic docs for backend web APIs.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/features/",
+              "quote": "Automatic docs"
+            },
+            {
+              "url": "https://fastapi.tiangolo.com/",
+              "quote": "Interactive API docs"
+            }
+          ]
+        },
+        {
+          "statement": "Python is not suitable for backend MVP APIs when low-level performance dominates requirements.",
+          "citations": [
+            {
+              "url": "https://www.python.org/doc/essays/blurb/",
+              "quote": "Python is an interpreted, object-oriented, high-level programming language with dynamic semantics."
+            },
+            {
+              "url": "https://www.python.org/doc/essays/blurb/",
+              "quote": "increased productivity it provides"
+            }
+          ]
+        },
+        {
+          "statement": "Synchronous-only stacks are not recommended for high-throughput IO-bound backend services.",
+          "citations": [
+            {
+              "url": "https://docs.python.org/3/library/asyncio.html",
+              "quote": "asyncio is a library to write concurrent code using the async/await syntax."
+            },
+            {
+              "url": "https://docs.python.org/3/library/asyncio.html",
+              "quote": "This invalid delta sync quote is not on the page."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "prompt": "Is FastAPI recommended for backend API teams?",
+  "responses": [
+    {
+      "model": "mock-alpha",
+      "claims": [
+        {
+          "statement": "FastAPI is recommended for backend API teams that need automatic documentation.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/features/",
+              "quote": "Automatic docs"
+            },
+            {
+              "url": "https://fastapi.tiangolo.com/features/",
+              "quote": "based on open standards"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "model": "mock-beta",
+      "claims": [
+        {
+          "statement": "FastAPI is recommended for backend API teams building HTTP services quickly.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/",
+              "quote": "Interactive API docs"
+            },
+            {
+              "url": "https://fastapi.tiangolo.com/",
+              "quote": "automatic interactive documentation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "model": "mock-gamma",
+      "claims": [
+        {
+          "statement": "FastAPI is not recommended for backend API teams when legacy sync stacks are mandatory.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/",
+              "quote": "web framework for building APIs with Python"
+            },
+            {
+              "url": "https://docs.python.org/3/library/asyncio.html",
+              "quote": "asyncio is a library to write concurrent code using the async/await syntax."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "model": "mock-delta",
+      "claims": [
+        {
+          "statement": "FastAPI is not recommended for backend API teams constrained to blocking-only runtimes.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/features/",
+              "quote": "Automatic docs"
+            },
+            {
+              "url": "https://docs.python.org/3/library/asyncio.html",
+              "quote": "asyncio is used as a foundation for multiple Python asynchronous frameworks"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

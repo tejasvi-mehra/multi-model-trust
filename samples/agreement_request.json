@@ -1,0 +1,77 @@
+{
+  "prompt": "Do Python API frameworks help backend teams ship documented APIs quickly?",
+  "responses": [
+    {
+      "model": "mock-alpha",
+      "claims": [
+        {
+          "statement": "FastAPI supports automatic API documentation for backend APIs.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/",
+              "quote": "Interactive API docs"
+            },
+            {
+              "url": "https://fastapi.tiangolo.com/",
+              "quote": "automatic interactive documentation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "model": "mock-beta",
+      "claims": [
+        {
+          "statement": "FastAPI supports automatic API documentation for backend teams.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/features/",
+              "quote": "Automatic docs"
+            },
+            {
+              "url": "https://fastapi.tiangolo.com/",
+              "quote": "web framework for building APIs with Python"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "model": "mock-gamma",
+      "claims": [
+        {
+          "statement": "FastAPI supports automatic API documentation for backend services.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/features/",
+              "quote": "Automatic docs"
+            },
+            {
+              "url": "https://fastapi.tiangolo.com/features/",
+              "quote": "based on open standards"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "model": "mock-delta",
+      "claims": [
+        {
+          "statement": "FastAPI supports automatic API documentation for backend HTTP APIs.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/",
+              "quote": "Interactive API docs"
+            },
+            {
+              "url": "https://fastapi.tiangolo.com/features/",
+              "quote": "based on open standards"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

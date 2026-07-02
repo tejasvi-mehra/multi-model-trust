@@ -1,0 +1,77 @@
+{
+  "prompt": "Can the service reject claims when every model cites bad evidence?",
+  "responses": [
+    {
+      "model": "mock-alpha",
+      "claims": [
+        {
+          "statement": "FastAPI supports automatic API docs.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/features/",
+              "quote": "This invalid alpha quote is not on the page."
+            },
+            {
+              "url": "https://www.python.org/doc/essays/blurb/",
+              "quote": "This invalid alpha python quote is not on the page."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "model": "mock-beta",
+      "claims": [
+        {
+          "statement": "FastAPI supports automatic API documentation.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/",
+              "quote": "This invalid beta quote is not on the page."
+            },
+            {
+              "url": "https://docs.python.org/3/library/asyncio.html",
+              "quote": "This invalid beta asyncio quote is not on the page."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "model": "mock-gamma",
+      "claims": [
+        {
+          "statement": "FastAPI supports interactive API documentation.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/features/",
+              "quote": "This invalid gamma quote is not on the page."
+            },
+            {
+              "url": "https://www.python.org/doc/essays/blurb/",
+              "quote": "Another invalid gamma quote missing from source."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "model": "mock-delta",
+      "claims": [
+        {
+          "statement": "FastAPI supports generated API docs.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/",
+              "quote": "This invalid delta quote is not on the page."
+            },
+            {
+              "url": "https://fastapi.tiangolo.com/features/",
+              "quote": "Another invalid delta quote missing from source."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

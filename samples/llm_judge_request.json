@@ -1,0 +1,77 @@
+{
+  "prompt": "Do FastAPI docs help backend teams and services understand APIs?",
+  "responses": [
+    {
+      "model": "mock-alpha",
+      "claims": [
+        {
+          "statement": "FastAPI supports automatic API documentation for backend teams building HTTP services.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/features/",
+              "quote": "Automatic docs"
+            },
+            {
+              "url": "https://fastapi.tiangolo.com/",
+              "quote": "web framework for building APIs with Python"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "model": "mock-beta",
+      "claims": [
+        {
+          "statement": "FastAPI supports automatic API documentation for backend teams building REST services.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/features/",
+              "quote": "Automatic docs"
+            },
+            {
+              "url": "https://fastapi.tiangolo.com/",
+              "quote": "Interactive API docs"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "model": "mock-gamma",
+      "claims": [
+        {
+          "statement": "FastAPI supports automatic API documentation for backend teams building web services.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/features/",
+              "quote": "based on open standards"
+            },
+            {
+              "url": "https://fastapi.tiangolo.com/",
+              "quote": "automatic interactive documentation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "model": "mock-delta",
+      "claims": [
+        {
+          "statement": "FastAPI supports automatic API documentation for backend teams building JSON services.",
+          "citations": [
+            {
+              "url": "https://fastapi.tiangolo.com/",
+              "quote": "Interactive API docs"
+            },
+            {
+              "url": "https://fastapi.tiangolo.com/features/",
+              "quote": "based on open standards"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

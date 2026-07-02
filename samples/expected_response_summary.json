@@ -1,0 +1,95 @@
+{
+  "agreement_request.json": {
+    "expected_consensus_labels": ["AGREE"],
+    "expected_citation_precision_if_sources_are_reachable": 1.0,
+    "expected_average_citation_support_score": 0.0883,
+    "expected_unreachable_citations": 0,
+    "expected_agreement_groups": 1,
+    "expected_disagreement_groups": 0,
+    "expected_partial_groups": 0,
+    "expected_invalid_response_groups": 0
+  },
+  "disagreement_request.json": {
+    "expected_consensus_labels": ["DISAGREE"],
+    "expected_citation_precision_if_sources_are_reachable": 1.0,
+    "expected_average_citation_support_score": 0.0649,
+    "expected_unreachable_citations": 0,
+    "expected_agreement_groups": 0,
+    "expected_disagreement_groups": 1,
+    "expected_partial_groups": 0,
+    "expected_invalid_response_groups": 0,
+    "expected_member_models": ["mock-alpha", "mock-beta", "mock-gamma", "mock-delta"]
+  },
+  "mixed_opinion_request.json": {
+    "expected_consensus_labels": ["DISAGREE"],
+    "expected_citation_precision_if_sources_are_reachable": 1.0,
+    "expected_average_citation_support_score": 0.0425,
+    "expected_unreachable_citations": 0,
+    "expected_agreement_groups": 0,
+    "expected_disagreement_groups": 1,
+    "expected_partial_groups": 0,
+    "expected_invalid_response_groups": 0,
+    "expected_in_favor_models": ["mock-alpha", "mock-beta"],
+    "expected_opposed_models": ["mock-gamma", "mock-delta"]
+  },
+  "llm_judge_request.json": {
+    "expected_consensus_labels": ["AGREE"],
+    "expected_citation_precision_if_sources_are_reachable": 1.0,
+    "expected_average_citation_support_score": 0.0765,
+    "expected_unreachable_citations": 0,
+    "expected_agreement_groups": 1,
+    "expected_disagreement_groups": 0,
+    "expected_partial_groups": 0,
+    "expected_invalid_response_groups": 0,
+    "expected_cross_llm_judge": true,
+    "engine": {
+      "similarity_threshold": 0.9,
+      "cross_llm_judge_enabled": true,
+      "cross_llm_judge_model_name": "LLM judge model",
+      "cross_llm_judge_borderline_low": 0.75,
+      "cross_llm_judge_borderline_high": 0.85
+    }
+  },
+  "all_invalid_citations_request.json": {
+    "expected_consensus_labels": ["INVALID"],
+    "expected_citation_precision_if_sources_are_reachable": 0.0,
+    "expected_average_citation_support_score": 0.0,
+    "expected_unreachable_citations": 0,
+    "expected_agreement_groups": 0,
+    "expected_disagreement_groups": 0,
+    "expected_partial_groups": 0,
+    "expected_invalid_response_groups": 1,
+    "expected_invalidated_members": 4,
+    "expected_invalid_citation_reason": "quote not found in fetched source"
+  },
+  "partial_invalid_citations_request.json": {
+    "expected_consensus_labels": ["AGREE"],
+    "expected_citation_precision_if_sources_are_reachable": 0.5,
+    "expected_average_citation_support_score": 0.1138,
+    "expected_unreachable_citations": 1,
+    "expected_agreement_groups": 1,
+    "expected_disagreement_groups": 0,
+    "expected_partial_groups": 0,
+    "expected_invalid_response_groups": 0,
+    "expected_invalidated_members": 2,
+    "expected_unreachable_reason": "source not reachable",
+    "expected_prioritized_models": ["mock-gamma", "mock-delta"]
+  },
+  "large_mixed_request.json": {
+    "expected_consensus_labels": [
+      "AGREE",
+      "DISAGREE",
+      "AGREE",
+      "PARTIAL",
+      "INVALID"
+    ],
+    "expected_citation_precision_if_sources_are_reachable": 0.9166666666666666,
+    "expected_average_citation_support_score": 0.0729,
+    "expected_unreachable_citations": 0,
+    "expected_agreement_groups": 2,
+    "expected_disagreement_groups": 1,
+    "expected_partial_groups": 1,
+    "expected_invalid_response_groups": 1,
+    "expected_minimum_claim_validations": 12
+  }
+}

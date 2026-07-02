@@ -1,0 +1,239 @@
+openapi: 3.1.0
+info:
+  title: Multi-Model Trust
+  version: 0.1.0
+  description: Route mock model responses, validate citations, and detect agreement.
+paths:
+  /healthz:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  service:
+                    type: string
+  /v1/trust-orchestrate:
+    post:
+      summary: Validate and compare model responses
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TrustRequest"
+      responses:
+        "200":
+          description: Trust orchestration result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrustResponse"
+        "422":
+          description: Invalid request payload
+components:
+  schemas:
+    Citation:
+      type: object
+      required: [url, quote]
+      properties:
+        url:
+          type: string
+          format: uri
+        quote:
+          type: string
+    Claim:
+      type: object
+      required: [statement]
+      properties:
+        statement:
+          type: string
+        citations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Citation"
+    ModelResponse:
+      type: object
+      required: [model, claims]
+      properties:
+        model:
+          type: string
+        claims:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/Claim"
+    TrustRequest:
+      type: object
+      required: [prompt, responses]
+      properties:
+        prompt:
+          type: string
+        responses:
+          type: array
+          minItems: 2
+          items:
+            $ref: "#/components/schemas/ModelResponse"
+    CitationValidation:
+      type: object
+      required: [url, quote, valid, quote_found, unreachable, support_score]
+      properties:
+        url:
+          type: string
+          format: uri
+        quote:
+          type: string
+        valid:
+          type: boolean
+        quote_found:
+          type: boolean
+        unreachable:
+          type: boolean
+        support_score:
+          type: number
+          minimum: 0
+          maximum: 1
+        reason:
+          type:
+            - string
+            - "null"
+    ClaimValidation:
+      type: object
+      required:
+        - model
+        - statement
+        - citations
+        - all_citations_valid
+        - citation_status
+      properties:
+        model:
+          type: string
+        statement:
+          type: string
+        citations:
+          type: array
+          items:
+            $ref: "#/components/schemas/CitationValidation"
+        all_citations_valid:
+          type: boolean
+        average_support_score:
+          type: number
+          minimum: 0
+          maximum: 1
+        citation_status:
+          type: string
+          enum: [VALID, INVALID, MISSING, UNREACHABLE]
+        invalid_reason:
+          type:
+            - string
+            - "null"
+    ConsensusMember:
+      type: object
+      required:
+        - model
+        - statement
+        - citation_urls
+        - citation_status
+        - citation_errors
+      properties:
+        model:
+          type: string
+        statement:
+          type: string
+        citation_urls:
+          type: array
+          items:
+            type: string
+            format: uri
+        citation_status:
+          type: string
+          enum: [VALID, INVALID, MISSING, UNREACHABLE]
+        citation_errors:
+          type: array
+          items:
+            type: string
+    CrossLlmJudgePrompt:
+      type: object
+      required: [model_name, prompt, decision]
+      properties:
+        model_name:
+          type: string
+        prompt:
+          type: string
+        decision:
+          type: string
+          enum: [AGREE, DISAGREE, NEUTRAL]
+    ConsensusGroup:
+      type: object
+      required: [label, summary, members]
+      properties:
+        label:
+          type: string
+          enum: [AGREE, DISAGREE, PARTIAL, INVALID]
+        summary:
+          type: string
+        members:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConsensusMember"
+        invalidated_members:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConsensusMember"
+        cross_llm_judge:
+          oneOf:
+            - $ref: "#/components/schemas/CrossLlmJudgePrompt"
+            - type: "null"
+    Metrics:
+      type: object
+      required:
+        - citation_precision
+        - validated_citations
+        - attempted_citations
+        - unreachable_citations
+        - average_citation_support_score
+        - agreement_groups
+        - disagreement_groups
+        - partial_groups
+        - invalid_response_groups
+      properties:
+        citation_precision:
+          type: number
+        validated_citations:
+          type: integer
+        attempted_citations:
+          type: integer
+        unreachable_citations:
+          type: integer
+        average_citation_support_score:
+          type: number
+        agreement_groups:
+          type: integer
+        disagreement_groups:
+          type: integer
+        partial_groups:
+          type: integer
+        invalid_response_groups:
+          type: integer
+    TrustResponse:
+      type: object
+      required: [prompt, validations, consensus, metrics]
+      properties:
+        prompt:
+          type: string
+        validations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ClaimValidation"
+        consensus:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConsensusGroup"
+        metrics:
+          $ref: "#/components/schemas/Metrics"
